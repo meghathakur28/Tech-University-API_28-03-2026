@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Components.Forms;
 using UniversityApi.Data;
 using UniversityApi.Interfaces;
 using UniversityApi.Models;
@@ -12,12 +13,13 @@ namespace UniversityApi.Repositories
         }
         public IEnumerable<Course> GetCoursesByInstructorName(string instructorName)
         {
-            
+            var courseInstructor = _context.Courses.Where(x => x.InstructorCourses.Any(c => c.Instructor.Name == instructorName)).ToList();
+            return courseInstructor;
         }
 
         public IEnumerable<Course> GetCoursesWithEnrollmentsAboveGrade(int grade)
         {
-            var coursesAboveGrade = _context.Courses.Where(x => x.Enrollments.Count >= 1).ToList();
+            var coursesAboveGrade = _context.Courses.Where(x => x.Enrollments.Any(c=>c.Grade==grade)).ToList();
             return coursesAboveGrade;
         }
 
@@ -29,6 +31,7 @@ namespace UniversityApi.Repositories
                 return false;
             }
             _context.Courses.Add(course);
+            _context.SaveChanges();
             return true;
         }
     }
