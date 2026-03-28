@@ -33,7 +33,23 @@ namespace UniversityApi.Repositories
 
         public IEnumerable<Instructor> GetInstructorsWithMostEnrollments()
         {
-            
+            var topInstructors = _context.Instructors
+                                  .Select(i => new
+                                  {
+                                  Instructor = i,
+        EnrollmentCount = i.InstructorCourses
+            .SelectMany(ic => ic.Course.Enrollments)
+            .Count()
+    })
+    .Where(x => x.EnrollmentCount ==
+        _context.Instructors
+            .Select(i => i.InstructorCourses
+                .SelectMany(ic => ic.Course.Enrollments)
+                .Count())
+            .Max())
+    .Select(x => x.Instructor)
+    .ToList();
+            return topInstructors;
         }
     }
 }
